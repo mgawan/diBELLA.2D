@@ -2,6 +2,8 @@
 
 
 #include "RunLoganAligner.hpp"
+#include "logan.hpp"
+#include "interface.hpp"
 
 using namespace std;
 

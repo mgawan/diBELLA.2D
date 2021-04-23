@@ -2,7 +2,7 @@
 
 #include "../../include/pw/GPULoganAligner.hpp"
 #include "../../LoganGPU/RunLoganAligner.hpp" 	// Call to aligner
-#include "../../LoganGPU/interface.hpp"		// LoganResult struct and SeedInterface struct
+//#include "../../LoganGPU/interface.hpp"		// LoganResult struct and SeedInterface struct
 
 #define MIN_OV_LEN 10000
 
@@ -341,8 +341,8 @@ GPULoganAligner::apply_batch
                     ai[i].endSeedV = xscores[i].endSeedV; 
 
 					// @GGGG: this is a bit redundant since we can extract it from seed
-					ai[i].seq_h_seed_length = ai[i].SeedInterface.endPositionH - ai[i].SeedInterface.beginPositionH;
-					ai[i].seq_v_seed_length = ai[i].SeedInterface.endPositionV - ai[i].SeedInterface.beginPositionV;
+					ai[i].seq_h_seed_length = ai[i].endSeedH - ai[i].begSeedH; //ai[i].SeedInterface.endPositionH - ai[i].SeedInterface.beginPositionH;
+					ai[i].seq_v_seed_length = ai[i].endSeedV - ai[i].begSeedV; //ai[i].SeedInterface.endPositionV - ai[i].SeedInterface.beginPositionV;
 				}
 			}
 		}
@@ -369,11 +369,11 @@ GPULoganAligner::apply_batch
 			if (passed)
 			{
 				// GGGG: store updated seed start/end position in the CommonKmers pairs (the semantics of these pairs change wrt the original semantics but that's okay)
-				cks->first.first   = getBeginPositionV(ai[i].begSeedV); 	// start on ver sequence
-				cks->second.first  = getBeginPositionH(ai[i].begSeedH);	    // start on hor sequence
+				cks->first.first   = ai[i].begSeedV; 	// start on ver sequence
+				cks->second.first  = ai[i].begSeedH;	    // start on hor sequence
 
-				cks->first.second  = getEndPositionV(ai[i].endSeedV); 		// end on ver sequence
-				cks->second.second = getEndPositionH(ai[i].endSeedH);		// end on hor sequence
+				cks->first.second  = ai[i].endSeedV; 		// end on ver sequence
+				cks->second.second = ai[i].endSeedH;		// end on hor sequence
 
 				cks->lenv 	= ai[i].seq_v_length;
 				cks->lenh 	= ai[i].seq_h_length;

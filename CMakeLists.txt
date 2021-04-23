@@ -21,6 +21,7 @@ include_directories(
         $ENV{COMBBLAS_HOME}/CombBLAS/install/include
         $ENV{COMBBLAS_HOME}/LoganGPU
 	)
+add_subdirectory($ENV{COMBBLAS_HOME}/LoganGPU)
         # possibly add path to boost library (not necessary on Cori, just type 'module load boost')
 link_directories(
         $ENV{COMBBLAS_HOME}/CombBLAS/install/lib 
@@ -105,7 +106,7 @@ add_executable(dibella
     )
 
 set_property(TARGET dibella PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS OFF)
-set(DIBELLA_LINK_LIBRARY ${DIBELLA_LINK_LIBRARY} LOGAN_XD_LIBRARY_static GPU_LOC_STATIC)
+set(DIBELLA_LINK_LIBRARY ${DIBELLA_LINK_LIBRARY} LOGAN_LIBRARY_static CombBLAS LIBBLOOM-NOUPC MURMURHASH)
 target_link_libraries(dibella PUBLIC ${DIBELLA_LINK_LIBRARY})
 
 target_compile_definitions(
@@ -117,19 +118,21 @@ target_compile_definitions(
     -DUPPER_KMER_FREQ=${UPPER_KMER_FREQ}
 )
 
-if (MPI_FOUND)
+target_link_libraries(dibella PUBLIC ZLIB::ZLIB)
+
+if(MPI_FOUND)
     include_directories(${MPI_INCLUDE_PATH})
     target_link_libraries(dibella PUBLIC ${MPI_LIBRARIES})
 endif()
 
-find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
-if (CUDA_FOUND)
-	message(STATUS "Cuda found...")
-endif()
-message(STATUS "${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
-message(STATUS "${CUDART_LIBRARY}")
-target_include_directories(dibella PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-target_link_libraries(dibella PUBLIC ${CUDART_LIBRARY})
+#find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
+#if (CUDA_FOUND)
+#	message(STATUS "Cuda found...")
+#endif()
+#message(STATUS "${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
+#message(STATUS "${CUDART_LIBRARY}")
+#target_include_directories(dibella PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+#target_link_libraries(dibella PUBLIC ${CUDART_LIBRARY})
 
 if(OPENMP_FOUND OR OpenMP_CXX_FOUND)
     # Set THREADED if OpenMP is found
